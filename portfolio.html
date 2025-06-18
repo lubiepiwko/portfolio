@@ -1,0 +1,1697 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My One-Pager</title>
+
+  <style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html, body {
+  overflow-x: hidden;
+}
+
+/* —————————————————————————— BODY / MAZE —————————————————————————— */
+body {
+  font-family: "Helvetica Neue", Helvetica, sans-serif;
+  font-size: 28px;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+  overflow: hidden;
+}
+
+.maze-container {
+  position: relative;
+  width: 95vw;
+  height: 95vh;
+  background: #fff;
+  border-radius: 20px 0 20px 20px;
+  overflow: hidden;
+}
+
+/* Bottom‐left credit */
+.bottom-left-text {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: .8rem;
+  font-size: 12px;
+  color: #fff;
+  z-index: 100;
+}
+
+/* Top‐right menu */
+.top-right-tab {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #fff;
+  padding: 1rem;
+  border-radius: 0 0 0 10px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.menu-button {
+  border: none;
+  background: none;
+  font-size: 28px;
+  cursor: pointer;
+  padding: .25rem 0;
+}
+.menu-button:hover { text-decoration: underline; }
+.menu-container {
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height .4s ease;
+  margin-top: .5rem;
+}
+.menu-container.open { max-height: 300px; }
+.menu-container a {
+  display: block;
+  margin: .5rem 0;
+  color: #000;
+  text-decoration: none;
+}
+.menu-container a:hover { text-decoration: underline; }
+
+/* Canvases */
+#three-canvas { width: 100%; height: 100%; display: block; }
+#map-canvas    { display: none; }
+
+/* —————————————————————————— MODAL BASE —————————————————————————— */
+.modal {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 90vw; height: 90vh;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 0 15px rgba(0,0,0,.3);
+  z-index: 1000;
+  overflow-y: auto;
+  display: none;
+  scrollbar-width: none;
+}
+.close-btn {
+  position: absolute;
+  top: 10px; right: 15px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 1002;
+}
+.close-btn:hover { opacity: .7; }
+
+/* Shared modal-content */
+.modal-content {
+  position: relative;
+  width: 100%; height: 100%;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* —————————————————————————— CONTACT —————————————————————————— */
+#contactModal .modal-content { position: relative; }
+#contactModal #snakeCanvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 9999;
+  pointer-events: none;
+}
+#contactModal .contact-card {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  background: #fff;
+  border: 2px solid #000;
+  padding: 3rem 4rem;
+  text-align: center;
+  box-shadow: 10px 10px 0 #000;
+  font-family: 'Inter', sans-serif;
+  z-index: 1;
+}
+#contactModal .contact-card h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+}
+#contactModal .contact-card p {
+  font-size: 1.5rem;
+  margin: 1rem 0;
+}
+#contactModal .contact-card a {
+  color: #000;
+  text-decoration: none;
+  border-bottom: 2px solid #000;
+  transition: .2s;
+}
+#contactModal .contact-card a:hover {
+  color: #fff;
+  background: #000;
+}
+
+/* —————————————————————————— RESUME —————————————————————————— */
+#resumeModal .resume-wrapper {
+  display: flex;
+  flex: 1;
+  gap: 2rem;
+  height: 100%;
+  background: #fff;
+  color: #000;
+  font-family: Arial, sans-serif;
+}
+.resume-wrapper .left,
+.resume-wrapper .right {
+  padding: 40px;
+}
+.resume-wrapper .left {
+  flex: 1;
+  border-right: 1px solid #000;
+  display: flex;
+  flex-direction: column;
+}
+.top-left { font-size: 1.2rem; margin-bottom: 40px; }
+.h-line { height: 1px; background: #444; margin: 20px 0; }
+.bio-block .name {
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.4;
+  margin: 0 0 10px 25%;
+}
+.bio-block .info { font-size: 1rem; margin-left: 25%; }
+.bio-block .location {
+  font-size: 1rem;
+  margin: 20px 0 0 50%;
+}
+.resume-wrapper .right {
+  flex: 1;
+  overflow-y: auto;
+}
+.right .header {
+  font-size: 1.5rem;
+  margin: 0 0 20px;
+  text-align: right;
+}
+.section { margin-bottom: 30px; }
+.section-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+.sub {
+  font-size: .95rem;
+  line-height: 1.4;
+  margin: 0 0 10px;
+}
+
+/* Resume responsive */
+@media(max-width: 768px) {
+  .resume-wrapper { flex-direction: column; }
+  .resume-wrapper .left,
+  .resume-wrapper .right {
+    padding: 24px;
+    border: none;
+  }
+  .right .header { text-align: left; }
+}
+
+/* —————————————————————————— ABOUT —————————————————————————— */
+:root {
+  --machine-pad: clamp(16px,4vw,32px);
+  --slot-size: clamp(64px,18vw,120px);
+  --gap: clamp(8px,4vw,24px);
+  --border: 8px;
+}
+#aboutModal .about-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+#aboutModal .machine {
+  position: absolute;
+  top: 45%; left: 50%;
+  transform: translate(-50%,-40%);
+  border: var(--border) solid #111;
+  border-radius: 12px;
+  background: linear-gradient(to bottom,#e0e0e0,#cfcfcf);
+  padding: var(--machine-pad);
+  text-align: center;
+  box-shadow: 6px 6px 0 #111, inset 0 0 10px rgba(0,0,0,.1);
+  transition: all 1s ease;
+  z-index: 2;
+}
+#aboutModal .machine.moved { left: 30%; }
+@media(max-width: 700px) {
+  #aboutModal .machine.moved { left: 50%; }
+}
+@media(max-width: 600px) {
+  #aboutModal .machine {
+    position: static;
+    margin: 60px auto 24px;
+    transform: none;
+  }
+}
+#aboutModal .slots {
+  display: flex;
+  gap: var(--gap);
+  margin-bottom: 24px;
+  border-bottom: 2px dashed #111;
+  padding-bottom: 20px;
+}
+#aboutModal .slot {
+  width: var(--slot-size);
+  height: var(--slot-size);
+  border: calc(var(--border)*.6) solid #111;
+  border-radius: 6px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 0 6px rgba(0,0,0,.2);
+}
+#aboutModal .symbol {
+  font-size: calc(var(--slot-size)*.6);
+  font-weight: bold;
+  line-height: 1;
+}
+#aboutModal .symbol.bar {
+  font-size: calc(var(--slot-size)*.35);
+}
+#aboutModal button#spin-btn {
+  padding: 12px 32px;
+  border: 3px solid #111;
+  background: linear-gradient(to bottom,#333,#111);
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #111;
+  transition: .2s;
+}
+#aboutModal button#spin-btn:hover:not(:disabled) {
+  background: linear-gradient(to bottom,#555,#222);
+  transform: translateY(-2px);
+  box-shadow: 6px 6px 0 #111;
+}
+#aboutModal button#spin-btn:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 2px 2px 0 #111;
+}
+#aboutModal button#spin-btn:disabled {
+  background: linear-gradient(to bottom,#777,#555);
+  cursor: not-allowed;
+  filter: grayscale(50%);
+}
+@media(max-width: 900px) {
+  #aboutModal button#spin-btn {
+    font-size: 1rem;
+    padding: 10px 28px;
+  }
+}
+#aboutModal #about-text {
+  position: absolute;
+  top: 45%;
+  transform: translateY(-45%);
+  right: -50%;
+  max-width: clamp(260px,35vw,400px);
+  opacity: 0;
+  transition: all 1s ease;
+  z-index: 1;
+}
+#aboutModal #about-text.visible {
+  right: 12%;
+  opacity: 1;
+}
+#aboutModal #about-text p:first-child {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+}
+#aboutModal #about-text p {
+  font-size: 1rem;
+  line-height: 1.2;
+  margin: 0 0 1rem;
+}
+@media(max-width: 600px) {
+  #aboutModal #about-text {
+    position: static;
+    transform: none;
+    opacity: 1;
+    margin: 0 auto 40px;
+    text-align: left;
+  }
+}
+
+@keyframes crank {
+  0%   { transform: translate(-50%,-40%) rotate(0); }
+  25%  { transform: translate(-50%,-40%) rotate(-5deg); }
+  50%  { transform: translate(-50%,-40%) rotate(5deg); }
+  75%  { transform: translate(-50%,-40%) rotate(-3deg); }
+  100% { transform: translate(-50%,-40%) rotate(0); }
+}
+#aboutModal .machine.crank {
+  animation: crank .6s ease;
+}
+
+@keyframes pop {
+  0%   { transform: translate(-50%,-50%) scale(1); opacity:1; }
+  100% { transform: translate(calc(-50% + var(--x)),calc(-50% + var(--y))) scale(0); opacity:0; }
+}
+#aboutModal .confetti {
+  position: absolute;
+  width: 10px; height: 10px;
+  background: purple;
+  top: 50%; left: 50%;
+  border-radius: 50%;
+  animation: pop .8s forwards ease-out;
+  z-index: 2001;
+  pointer-events: none;
+}
+
+/* —————————————————————————— WORK MODAL BASE —————————————————————————— */
+#workModal .modal-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+#workModal .work-header {
+  position: sticky;
+  top: 0;
+  background: transparent;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  z-index: 10;
+}
+
+/* Buttons inside the header */
+#workModal .work-header .arrow-only,
+#workModal .work-header .close-btn {
+  all: unset;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: .25rem .5rem;
+  transition: opacity 0.2s;
+}
+
+/* Adjust spacing for the back arrow */
+#workModal .work-header .arrow-only {
+  margin-right: 0.5rem;
+}
+
+/* Hover effect */
+#workModal .work-header .arrow-only:hover,
+#workModal .work-header .close-btn:hover {
+  opacity: 0.6;
+}
+
+#workModal .grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 200px);
+  gap: 20px;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+#workModal .button {
+  background: #fff;
+  border: 2px solid #000;
+  padding: 2rem;
+  text-align: center;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: .2s;
+  box-shadow: 6px 6px 0 #000;
+}
+
+#workModal .button:hover {
+  background: #000;
+  color: #fff;
+}
+#workModal .work-header .arrow-only {
+  margin-right: 0.5rem;
+  transform: translateY(2px); /* <- this lowers it */
+}
+/* —————————————————————————— PROJECT OVERLAY CUSTOM —————————————————————————— */
+.title-container {
+  width: 45vw;
+  height: 15vh;
+  margin: 0 auto;
+  overflow: hidden;
+  position: relative;
+}
+.title-text {
+  font-family: Impact, Charcoal, sans-serif;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform-origin: top left;
+  white-space: nowrap;
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+}
+.description {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 40px;
+  font-size: 0.9rem;
+  margin-left: 2.5vw;
+  margin-right: 2.5vw;
+  margin-top: 5vw;
+}
+.description-column {
+  flex: 1;
+  min-width: 250px;
+}
+.accordion-wrapper {
+  width: 85vw;
+  margin: 0 auto;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+.accordion-container {
+  display: flex;
+  height: 40vh;
+   margin-bottom: 1rem;
+}
+.accordion-image {
+  flex: 1;
+  transition: flex 0.5s ease;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+}
+.accordion-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+.accordion-image:hover {
+  flex: 8;
+}
+.accordion-image:not(:hover) {
+  flex: 1;
+}
+.overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background-color: rgba(0, 0, 0, 0.9);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.overlay img {
+  max-width: 90%;
+  max-height: 90%;
+}
+.overlay.active {
+  display: flex;
+}
+/* ————————— FULL-SCREEN IMAGE VIEWER ————————— */
+.fs-overlay{
+  position:fixed;
+  inset:0;                       /* top:0 right:0 bottom:0 left:0 */
+  background:rgba(0,0,0,.9);
+  display:none;                  /* toggled with .active */
+  align-items:center;
+  justify-content:center;
+  z-index:2000;                  /* sit above every modal */
+}
+.fs-overlay.active{display:flex;}
+
+.fs-overlay img{
+  max-width:92vw;                /* leave a subtle margin */
+  max-height:92vh;
+  box-shadow:0 0 20px rgba(0,0,0,.6);
+  cursor:zoom-out;
+}
+/* Center the grid inside the default Work view */
+#workModal .work-body{
+  flex: 1;                 /* fill the remaining height under the header */
+  display: flex;
+  align-items: center;     /* vertical centering  */
+  justify-content: center; /* horizontal centering (extra safety) */
+}
+/* Nudge the buttons upward a bit (adjust pixel value to taste) */
+#workModal .grid-container{
+  transform: translateY(-40px);   /* try -20px → -40px until it feels right */
+}
+.title-container{
+  width: 40vw;          /* requested width  */
+  height: 10vh;         /* keep existing height */
+  margin: 0 0 0 2.5vw;  /* 2.5 vw left margin, zero top/right/bottom */
+  overflow: hidden;
+  position: relative;
+}
+/* turn the deck into a vertical flex-column */
+#workModal.project-open .project-deck{
+  display:flex;
+  flex-direction:column;
+  height:100%;          /* already full height */
+}
+
+/* push accordion to the end and lift it 2 rem */
+#workModal.project-open .accordion-wrapper{
+  margin-top:auto;      /* occupies leftover vertical space */
+  margin-bottom:2rem;   /* fixed 2 rem gap from viewport bottom */
+}
+/* ————————— ENTRY (MAZE INSTRUCTIONS) MODAL ————————— */
+#entryModal .maze-instructions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  padding: 2rem;
+  background: #f9f9f9;
+}
+
+#entryModal .instruction-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 140px);
+  gap: 3rem 4rem;
+}
+
+#entryModal .instruction-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#entryModal .icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 1rem;
+}
+
+#entryModal .label {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="maze-container">
+    <canvas id="three-canvas"></canvas>
+    <canvas id="map-canvas"></canvas>
+
+    <div class="top-right-tab">
+      <button id="menuButton" class="menu-button">Menu ☰</button>
+      <div id="menuContainer" class="menu-container">
+        <a href="#about">About</a>
+        <a href="#work">Work</a>
+        <a href="#contact">Contact</a>
+        <a href="#resume">Resume</a>
+      </div>
+    </div>
+
+    <div class="bottom-left-text">Filip Maliszewski ©</div>
+  </div>
+
+  <!-- ——————————————— ABOUT MODAL ——————————————— -->
+  <div id="aboutModal" class="modal">
+    <span class="close-btn" id="closeAboutModal">&times;</span>
+    <div class="modal-content">
+      <main class="about-content">
+        <div class="machine" id="machine">
+          <div class="slots">
+            <div class="slot" id="slot1"><span class="symbol">7</span></div>
+            <div class="slot" id="slot2"><span class="symbol bar">BAR</span></div>
+            <div class="slot" id="slot3"><span class="symbol">★</span></div>
+          </div>
+          <button id="spin-btn" aria-label="Spin the slot machine">SPIN</button>
+        </div>
+
+        <section id="about-text">
+          <p><strong>Addicted?</strong></p>
+          <p>I'm Filip, a 23-year-old student at the Gerrit Rietveld Academie in Amsterdam, set to graduate in 2026 with a Bachelor of Design and Fine Arts. My work dives into design, but also thorny topics like politics, privacy, surveillance, and capitalism's delightful degeneracy.</p>
+          <p>Outside serious stuff, I enjoy European deserts (Poland has five, just saying), indie horror games I've never actually played, and the original version of “Tom's Diner” by Suzanne Vega. Oh, and this website? Hand-coded from scratch by yours truly, with a bit of (emotional) assistance from ChatGPT.</p>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- ——————————————— WORK MODAL ——————————————— -->
+  <div id="workModal" class="modal">
+    <div class="modal-content">
+      <div class="work-header">
+        <span class="close-btn" id="closeWorkModal">&times;</span>
+      </div>
+      <div class="work-body">
+        <div class="grid-container">
+          <div class="button" data-id="0">Observer</div>
+          <div class="button" data-id="1">Vanished</div>
+          <div class="button" data-id="2">Double</div>
+          <div class="button" data-id="3">Herald</div>
+          <div class="button" data-id="4">Oracle</div>
+          <div class="button" data-id="5">Wanderer</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ——————————————— CONTACT MODAL ——————————————— -->
+  <div id="contactModal" class="modal">
+    <span class="close-btn" id="closeContactModal">&times;</span>
+    <div class="modal-content">
+      <canvas id="snakeCanvas"></canvas>
+      <div class="contact-card">
+        <h1>Contact</h1>
+        <p><a href="mailto:maliszewski.fx@gmail.com">maliszewski.fx@gmail.com</a></p>
+        <p><a href="https://www.instagram.com/jpgfilip/" target="_blank">@jpgfilip</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ——————————————— RESUME MODAL ——————————————— -->
+  <div id="resumeModal" class="modal">
+    <span class="close-btn" id="closeResumeModal">&times;</span>
+    <div class="modal-content">
+      <section id="resume" class="resume-wrapper">
+        <div class="left">
+          <div class="top-left">01</div><div class="h-line"></div>
+          <div class="bio-block">
+            <div class="name">Filip<br>Maliszewski</div>
+            <div class="info">04 · 10 · 2001</div>
+            <div class="location">Tczew<br>Poland</div>
+          </div>
+        </div>
+        <div class="right">
+          <div class="header"></div>
+          <div class="section"><h2 class="section-title">education</h2><div class="h-line"></div>
+            <p class="sub"><strong>Gerrit Rietveld Academie</strong><br>BA in Design &amp; Fine Arts — <i>until 2026</i></p>
+            <p class="sub">Liceum Plastyczne im. Magdaleny Abakanowicz, Gdynia<br>Diploma in Fine Arts & Art History (2021),<br>specialisation: photography</p>
+          </div>
+          <div class="section"><h2 class="section-title">selected works</h2><div class="h-line"></div>
+            <p class="sub"><strong>IFFR </strong>— teaser for short-film programme (2023)<br><strong>Rotterdam The Hague Airport </strong>— video installation (2023)<br><strong>Angeltooth </strong>— visual campaign &amp; posters (2024)<br><strong>Soapbox Magazine </strong>— lead photographer (2024)<br>Miss Polonia — collaborative project chosen by <strong>Turnus Gallery</strong>, Warsaw (2025)</p>
+          </div>
+          <div class="section"><h2 class="section-title">skills</h2><div class="h-line"></div>
+            <p class="sub">photo editing, darkroom processes, studio lighting</p>
+            <p class="sub">English (C1), Polish (native)</p>
+            <p class="sub">Adobe CC (InDesign, Photoshop, Premiere, Lightroom)</p>
+            <p class="sub">quick thinking &amp; improvisation</p>
+            <p class="sub">basic <strong>HTML</strong>, <strong>CSS</strong>, <strong>Python</strong></p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+<div id="globalFullscreenOverlay" class="fs-overlay">
+  <img id="globalFullscreenImage" alt="">
+</div>
+  
+    <!-- ——————————————— ENTRY (MAZE INSTRUCTIONS) MODAL ——————————————— -->
+  <div id="entryModal" class="modal">
+    <span class="close-btn" id="closeEntryModal">&times;</span>
+    <div class="modal-content">
+      <div class="maze-instructions">
+        <div class="instruction-grid">
+
+          <!-- Move -->
+          <div class="instruction-block">
+            <svg class="icon" viewBox="0 0 24 24" fill="none"
+                 stroke="black" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="12 19 12 5"/>
+              <polyline points="6 11 12 5 18 11"/>
+            </svg>
+            <div class="label">Move</div>
+          </div>
+
+          <!-- Turn -->
+          <div class="instruction-block">
+            <svg class="icon" viewBox="0 0 24 24" fill="none"
+                 stroke="black" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="8 4 3 9 8 14"/>
+              <polyline points="16 4 21 9 16 14"/>
+            </svg>
+            <div class="label">Turn</div>
+          </div>
+
+          <!-- Enter Portal -->
+          <div class="instruction-block">
+            <svg class="icon" viewBox="0 0 24 24" fill="none"
+                 stroke="black" stroke-width="2">
+              <circle cx="12" cy="12" r="8"/>
+            </svg>
+            <div class="label">Enter Portal</div>
+          </div>
+
+          <!-- Open Menu -->
+          <div class="instruction-block">
+            <svg class="icon" viewBox="0 0 24 24" fill="none"
+                 stroke="black" stroke-width="2">
+              <line x1="4" y1="6" x2="20" y2="6"/>
+              <line x1="4" y1="12" x2="20" y2="12"/>
+              <line x1="4" y1="18" x2="20" y2="18"/>
+            </svg>
+            <div class="label">Open Menu</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+    <script type="module">
+  import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.module.js";
+
+  /* ───── cache any DOM elements that used to be “magically” global ───── */
+  const slot1 = document.getElementById('slot1');
+  const slot2 = document.getElementById('slot2');
+  const slot3 = document.getElementById('slot3');
+
+// ——————————————— DOM READY ———————————————
+document.addEventListener('DOMContentLoaded', () => {
+  initUI();
+  initSlotMachine();
+  initMaze();
+  openModal(document.getElementById('entryModal'));
+});
+
+// ——————————————— UI & MODALS ———————————————
+function initUI() {
+  const menuBtn       = document.getElementById('menuButton');
+  const menuContainer = document.getElementById('menuContainer');
+  const modals = {
+    '#about':   document.getElementById('aboutModal'),
+    '#work':    document.getElementById('workModal'),
+    '#contact': document.getElementById('contactModal'),
+    '#resume':  document.getElementById('resumeModal'),
+  };
+
+  menuBtn.addEventListener('click', () =>
+    menuContainer.classList.toggle('open')
+  );
+
+  Object.entries(modals).forEach(([hash, modal]) => {
+    const link = document.querySelector(`a[href="${hash}"]`);
+    link?.addEventListener('click', e => {
+      e.preventDefault();
+      openModal(modal);
+    });
+  });
+
+  document.querySelectorAll('.close-btn').forEach(btn => {
+    btn.addEventListener('click', () =>
+      btn.closest('.modal').style.display = 'none'
+    );
+  });
+}
+
+function openModal(modal) {
+  modal.style.display = 'block';
+  modal.scrollTop   = 0;
+
+  // Lazy init snake
+  if (modal.id === 'contactModal' && !snakeInited) {
+    initSnake();
+  }
+  // Render default work grid
+  if (modal.id === 'workModal') {
+    renderDefaultWorkModal();
+  }
+}
+
+// ——————————————— ABOUT / SLOT-MACHINE ———————————————
+const symbols = ['7','BAR','★','◆','♠','♥'];
+let firstSpin = true;
+
+function initSlotMachine() {
+  const reels   = [slot1, slot2, slot3];
+  const spinBtn = document.getElementById('spin-btn');
+  const aboutT  = document.getElementById('about-text');
+  const machine = document.getElementById('machine');
+
+  spinBtn.addEventListener('click', () => {
+    spinBtn.disabled = true;
+    machine.classList.add('crank');
+
+    reels.forEach((slot, idx) => {
+      let duration = 1200 + idx * 300;
+      let elapsed  = 0;
+
+      const tick = setInterval(() => {
+        setSymbol(slot, randomSymbol());
+        elapsed += 100;
+        if (elapsed >= duration) {
+          clearInterval(tick);
+          // Guarantee a '7' on first spin or on first reel
+          if (firstSpin || idx === 0) setSymbol(slot, '7');
+
+          // When last reel stops
+          if (idx === reels.length - 1) {
+            setTimeout(() => {
+              machine.classList.remove('crank');
+              machine.classList.add('moved');
+              setTimeout(() => aboutT.classList.add('visible'), 300);
+
+              const result = reels.map(s =>
+                s.querySelector('.symbol').textContent
+              );
+              if (result.every(r => r === '7')) createConfetti();
+
+              spinBtn.disabled = false;
+              firstSpin = false;
+            }, 300);
+          }
+        }
+      }, 100);
+    });
+  });
+}
+
+function randomSymbol() {
+  return symbols[Math.floor(Math.random() * symbols.length)];
+}
+function setSymbol(slotEl, sym) {
+  const span = slotEl.querySelector('.symbol');
+  span.classList.toggle('bar', sym === 'BAR');
+  span.textContent = sym;
+}
+function createConfetti() {
+  const stage = document.querySelector('#aboutModal .modal-content');
+  for (let i = 0; i < 20; i++) {
+    const d = document.createElement('div');
+    d.className = 'confetti';
+    d.style.setProperty('--x', `${(Math.random() - 0.5) * 300}px`);
+    d.style.setProperty('--y', `${(Math.random() - 0.5) * 300}px`);
+    stage.appendChild(d);
+    setTimeout(() => d.remove(), 800);
+  }
+}
+
+// ——————————————— CONTACT / SNAKE ———————————————
+let snakeInited = false;
+function initSnake() {
+  snakeInited = true;
+
+  const canvas = document.getElementById('snakeCanvas');
+  const ctx    = canvas.getContext('2d');
+  const grid   = 20;
+  let cols, rows, snake, dir, apple, alive;
+
+  const rnd = m => Math.floor(Math.random() * m);
+  const cellFree = (x, y) =>
+    !snake.some(p => p.x === x && p.y === y);
+
+  function resize() {
+    canvas.width  = canvas.parentElement.clientWidth;
+    canvas.height = canvas.parentElement.clientHeight;
+    cols = Math.floor(canvas.width  / grid);
+    rows = Math.floor(canvas.height / grid);
+  }
+  function spawnApple() {
+    const free = [];
+    for (let x = 0; x < cols; x++)
+      for (let y = 0; y < rows; y++)
+        if (cellFree(x, y)) free.push({ x, y });
+    apple = free[rnd(free.length)];
+  }
+  function resetGame() {
+    const cx = Math.floor(cols / 2),
+          cy = Math.floor(rows / 2);
+    snake = Array.from({ length: 20 }, (_, i) => ({
+      x: cx - i, y: cy
+    }));
+    dir   = { x: 1, y: 0 };
+    alive = true;
+    spawnApple();
+  }
+  function hit(x, y) {
+    return (
+      x < 0 || y < 0 ||
+      x >= cols || y >= rows ||
+      snake.some(p => p.x === x && p.y === y)
+    );
+  }
+  function chooseDir() {
+    const head   = snake[0];
+    const id     = (x, y) => `${x},${y}`;
+    const h      = (x, y) => Math.abs(x - apple.x) + Math.abs(y - apple.y);
+    const open   = [{ x: head.x, y: head.y, g: 0, f: h(head.x, head.y) }];
+    const closed = new Set();
+    const came   = new Map();
+
+    while (open.length) {
+      open.sort((a, b) => a.f - b.f);
+      const cur = open.shift();
+      const cid = id(cur.x, cur.y);
+
+      if (cur.x === apple.x && cur.y === apple.y) {
+        let path = [cid];
+        while (came.has(path[0])) path.unshift(came.get(path[0]));
+        const [fx, fy] = path[0].split(',').map(Number);
+        const [tx, ty] = path[1].split(',').map(Number);
+        return { x: tx - fx, y: ty - fy };
+      }
+
+      closed.add(cid);
+      for (const n of [{x:1,y:0},{x:-1,y:0},{x:0,y:1},{x:0,y:-1}]) {
+        const nx  = cur.x + n.x,
+              ny  = cur.y + n.y,
+              nid = id(nx, ny);
+        if (
+          nx < 0 || ny < 0 ||
+          nx >= cols || ny >= rows ||
+          closed.has(nid) ||
+          snake.some(p => p.x === nx && p.y === ny)
+        ) continue;
+
+        const g = cur.g + 1, f = g + h(nx, ny);
+        const ex = open.find(o => o.x === nx && o.y === ny);
+        if (ex) {
+          if (g < ex.g) { ex.g = g; ex.f = f; came.set(nid, cid); }
+        } else {
+          open.push({ x: nx, y: ny, g, f });
+          came.set(nid, cid);
+        }
+      }
+    }
+
+    // fallback: try any non-reverse direction
+    for (const d of [{x:0,y:-1},{x:1,y:0},{x:0,y:1},{x:-1,y:0}]) {
+      if (d.x === -dir.x && d.y === -dir.y) continue;
+      if (!hit(head.x + d.x, head.y + d.y)) return d;
+    }
+    return dir;
+  }
+
+  function update() {
+    if (!alive) return;
+    dir = chooseDir();
+    const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+    if (hit(head.x, head.y)) {
+      alive = false;
+      return setTimeout(resetGame, 1000);
+    }
+    snake.unshift(head);
+    if (head.x === apple.x && head.y === apple.y) {
+      spawnApple();
+    } else {
+      snake.pop();
+    }
+    if (snake.length === cols * rows) {
+      alive = false;
+      setTimeout(resetGame, 800);
+    }
+  }
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#000';
+    snake.forEach(p =>
+      ctx.fillRect(p.x * grid, p.y * grid, grid - 2, grid - 2)
+    );
+    ctx.fillRect(
+      apple.x * grid, apple.y * grid, grid - 2, grid - 2
+    );
+  }
+
+  // initialize & loop
+  window.addEventListener('resize', () => {
+    resize(); resetGame();
+  });
+  resize(); resetGame();
+  setInterval(() => { update(); draw(); }, 120);
+}
+
+// ——————————————— PROJECT DATA ———————————————
+const projects = [
+  {
+    title: "The Observer",
+    paragraphs: [
+      "An interactive installation using projection and a laptop running a custom facial-recognition program I coded in Python. Installed in a space corner, the system tracks and projects detected faces into a grid; low accuracy means face-like patterns in the room appear alongside real visitors.",
+      "All recognition attempts are logged — my record exceeds 700 000 projections."
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=600&h=900&fit=crop",
+      "https://images.unsplash.com/photo-1559027615-491906a2cd0e?w=900&h=600&fit=crop",
+      "https://images.unsplash.com/photo-1485115905815-74a5c9fda2d5?w=600&h=900&fit=crop"
+    ]
+  },
+  {
+    title: "The Vanished",
+    paragraphs: [
+      "2025 Mixed media installation (photographic prints, algorithmic surveillance capture) My work stems from an ongoing fascination with the paradoxes of surveillance capitalism. While traveling, I began photographing surveillance cameras and seemingly innocuous details—empty vans parked in remote areas, strangely trimmed bushes, signal antennas—objects that hinted at something subtly hostile, or hostile toward humans. This curiosity deepened when I learned about the island of Madeira, a remote Portuguese territory where people regularly vanish without a trace. Despite its isolation, the island is blanketed in high-definition surveillance—public 4K webcams stream continuously through platforms like madeira-web.com. This contradiction captured my attention: How can individuals disappear in a world where our every movement is obsessively tracked, archived, and commodified?",
+      "One particular case became a focal point: Jascha Hardenberg, a young German man who disappeared on December 29, 2020, while hiking in the Rabaçal area. His last known image—a selfie posted to Facebook—was taken at a Christmas market the day before his disappearance. I located a public webcam streaming live from that same market and developed a facial recognition bot using MTCNN to analyze the footage. The software captured over 80,000 facial images of passersby—people going about their lives, unaware they were being archived. This project exposes the surreal gap between technological omnipresence and human absence. It asks: in an era when our fridges can report our grocery needs, how can someone simply vanish? And what does this say about who is watched, why, and for whom"
+    ],
+    images: [
+      "https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?w=600&h=900&fit=crop",
+      "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=900&h=600&fit=crop"
+    ]
+  },
+  {
+    title: "Adrian B.",
+    paragraphs: [
+      "Once I F*cked Adrian B.* is a performance project exploring queerness and hyper-masculinity through Adrian B. — a “Dres” drag-king persona reflecting nationalist, homophobic culture from my Polish upbringing.",
+      "Created via self-portraits and a zine (Polycopies Paris 2023), the work satirizes repressed desire. Yolanda — Adrian’s softer alter ego — inverts these themes into a study of exile and queer self-construction."
+    ],
+    images: [
+      "https://live.staticflickr.com/65535/54350148350_f7fdafca16_h.jpg",
+      "https://live.staticflickr.com/65535/54349944789_2a2e33a1ce_h.jpg",
+      "https://live.staticflickr.com/65535/54349738271_80bde9ea6a_h.jpg",
+      "https://live.staticflickr.com/65535/54350148560_69c959969f_h.jpg",
+      "https://live.staticflickr.com/65535/54349962333_d9c02b7367_h.jpg",
+      "https://live.staticflickr.com/65535/54349944779_f97a606306_h.jpg",
+      "https://live.staticflickr.com/65535/54350148545_db2d3539b3_h.jpg"
+    ]
+  },
+  {
+    title: "poster design",
+    paragraphs: [
+      "A series of posters designed for: a queer charity event; two Angel Tooth Gem promos; and my first solo exhibition.",
+      "Each piece showcases a bold, graphic approach to queer visual culture — laser prints, RISO, and blunt typography as both protest and celebration."
+    ],
+    images: [
+      "https://live.staticflickr.com/65535/54491360104_51083a9b2e_h.jpg",
+      "https://live.staticflickr.com/65535/54491360084_06f8b4e8de_h.jpg",
+      "https://live.staticflickr.com/65535/54491514075_fb4b1a98a2_h.jpg",
+      "https://live.staticflickr.com/65535/54491171926_82f0ef9d85_h.jpg"
+    ]
+  },
+  {
+    title: "IFFR 2023",
+    paragraphs: [
+      "Official teaser for IFFR 2023’s Short Film Programme: one month’s work of hand-drawing every frame and composing a train-travel soundscape.",
+      "Created during a Willem de Kooning Academy competition, the one-minute clip captures the experimental essence of the festival’s short-film section."
+    ],
+    images: [
+      "https://live.staticflickr.com/65535/54491451884_506702637e_h.jpg",
+      "https://live.staticflickr.com/65535/54491264706_c741ad1b45_h.jpg",
+      "https://live.staticflickr.com/65535/54491264711_100816819c_h.jpg",
+      "https://live.staticflickr.com/65535/54491607150_e34003e292_h.jpg"
+    ]
+  },
+  {
+    title: "Pores",
+    paragraphs: [
+      "Dreamy landscapes, 5 A.M. cigarettes, Grindr hookups, fucked-up kitchen counters, and a train cabin on my way to - where exactly? This photographic series doesn’t depict home in any fixed or stable sense. Instead, it lingers in the porous, often aching in-between: between images, between bodies, between homes.",
+      "These snapshots map out a queer, migrant schizophrenia - a body navigating the distance between a dying Eastern European village and Amsterdam’s housing crisis and political turmoil."
+    ],
+    images: [
+      "https://live.staticflickr.com/65535/54269888959_e75c8d323c_k.jpg",
+      "https://live.staticflickr.com/65535/54270583579_6db20d66d8_k.jpg",
+      "https://live.staticflickr.com/65535/54270334751_4e9df8d91f_k.jpg",
+      "https://live.staticflickr.com/65535/54270581039_44dd203567_k.jpg",
+      "https://live.staticflickr.com/65535/54270629924_2ac7a171ab_k.jpg",
+      "https://live.staticflickr.com/65535/54270064655_b2e38a6c38_k.jpg",
+      "https://live.staticflickr.com/65535/54270333516_fd6df84c11_k.jpg",
+      "https://live.staticflickr.com/65535/54270062985_fce95cb77b_k.jpg",
+      "https://live.staticflickr.com/65535/54270574918_fb8e992961_k.jpg",
+      "https://live.staticflickr.com/65535/54335421666_0254a8f6f0_h.jpg"
+    ]
+  }
+];
+
+/* ——————————————— WORK GRID (default view) ——————————————— */
+function renderDefaultWorkModal() {
+  const workModal = document.getElementById('workModal');
+  workModal.classList.remove('project-open');
+
+  const content = document.querySelector('#workModal .modal-content');
+  content.innerHTML = `
+    <div class="work-header">
+      <span class="close-btn" id="closeWorkModal">&times;</span>
+    </div>
+    <div class="work-body">
+      <div class="grid-container">
+        ${projects.map((p,i)=>
+          `<div class="button" data-id="${i}">${p.title}</div>`).join('')}
+      </div>
+    </div>
+  `;
+
+  /* buttons → overlay */
+  content.querySelectorAll('.button').forEach(btn=>{
+    btn.addEventListener('click',
+      ()=> openOverlay(parseInt(btn.dataset.id)));
+  });
+
+  /* close */
+  content.querySelector('#closeWorkModal')
+         .addEventListener('click',
+           ()=> workModal.style.display='none');
+}
+/* ——————————————— WORK MODAL (overlay) ——————————————— */
+function openOverlay(id) {
+  const proj = projects[id] || projects[0];      // fallback
+  const workModal = document.getElementById('workModal');
+  const content   = document.querySelector('#workModal .modal-content');
+
+  /* split paragraphs into two roughly equal columns */
+  const mid  = Math.ceil(proj.paragraphs.length / 2);
+  const col1 = proj.paragraphs.slice(0, mid).map(p=>`<p>${p}</p>`).join('');
+  const col2 = proj.paragraphs.slice(mid).map(p=>`<p>${p}</p>`).join('');
+
+  /* build images for the accordion */
+  const imgs = proj.images.map(src=>`
+      <div class="accordion-image">
+        <img src="${src}" alt="${proj.title}">
+      </div>`).join('');
+
+  /* single (non-repeated) title */
+  const repeatedTitle = proj.title;
+
+  /* inject HTML */
+  workModal.style.display = 'block';
+  workModal.classList.add('project-open');
+
+  content.innerHTML = `
+    <div class="work-header">
+      <button id="backToWork" class="arrow-only">←</button>
+      <span class="close-btn" id="closeWorkModal">&times;</span>
+    </div>
+
+    <div class="project-deck">
+
+      <!-- TITLE -->
+      <div class="title-container">
+        <div class="title-text" id="titleText">${repeatedTitle}</div>
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div class="description">
+        <div class="description-column">${col1}</div>
+        <div class="description-column">${col2}</div>
+      </div>
+
+      <!-- ACCORDION IMAGES -->
+      <div class="accordion-wrapper">
+        <div class="accordion-container">
+          ${imgs}
+        </div>
+      </div>
+    </div>
+  `;
+
+  /* back & close */
+  content.querySelector('#backToWork')
+         .addEventListener('click', renderDefaultWorkModal);
+  content.querySelector('#closeWorkModal')
+         .addEventListener('click', ()=> workModal.style.display='none');
+
+  /* stretch title */
+  function stretchTitle() {
+    const container = document.querySelector('.title-container');
+    const text      = document.getElementById('titleText');
+    text.style.transform = 'translateY(-50%) scale(1,1)';
+    text.style.fontSize = '100px';
+    const scaleX = container.clientWidth  / text.offsetWidth;
+    const scaleY = container.clientHeight / text.offsetHeight;
+    text.style.transform = `translateY(-40%) scale(${scaleX}, ${scaleY})`;
+  }
+  window.addEventListener('resize', stretchTitle);
+  stretchTitle();
+
+  /* ——— GLOBAL full-screen viewer ——— */
+  const fsOverlay = document.getElementById('globalFullscreenOverlay');
+  const fsImg     = document.getElementById('globalFullscreenImage');
+
+  content.querySelectorAll('.accordion-image img').forEach(img=>{
+    img.addEventListener('click', ()=>{
+      fsImg.src = img.src;
+      fsOverlay.classList.add('active');
+    });
+  });
+
+  fsOverlay.addEventListener('click', ()=>{
+    fsOverlay.classList.remove('active');
+    fsImg.src = '';
+  });
+}
+window.openOverlay = openOverlay;
+
+// ——————————————— THREE.JS MAZE ———————————————
+function initMaze() {
+  const container = document.querySelector('.maze-container');
+  const canvas    = document.getElementById('three-canvas');
+ const renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type    = THREE.VSMShadowMap;
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); // ↓ pixels to shade
+renderer.outputEncoding = THREE.sRGBEncoding;
+
+  const scene   = new THREE.Scene();
+  const camera  = new THREE.PerspectiveCamera(80, 1, 0.5, 2000);
+  scene.add(camera);
+
+
+  // Will hold our portal meshes for hit-detection
+  const portals  = [];
+  let activePortal = null;
+  // Portal grid positions (r,c)
+  const ballCells = [
+    { r: 2, c: 6 }, { r: 6, c: 3 },
+    { r: 1, c: 1 }, { r: 4, c: 6 },
+    { r: 6, c: 1 }, { r: 3, c: 1 }
+  ];
+
+  // Resize handling
+  function onResize() {
+    const w = container.clientWidth, h = container.clientHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', onResize);
+  onResize();
+
+  // —————————————————————————————— Maze Data ——————————————————————————————
+  const tileSize = 80;
+  const maze = [
+    [1,1,1,1,1,1,1,1],
+    [1,0,0,0,0,0,0,1],
+    [1,1,1,1,0,1,0,1],
+    [1,0,1,1,0,1,1,1],
+    [1,0,0,0,0,1,0,1],
+    [1,0,1,1,0,0,0,1],
+    [1,0,1,0,0,1,0,1],
+    [1,1,1,1,1,1,1,1]
+  ];
+
+  // —————————————————————————————— Lighting & Shadows ——————————————————————————————
+  const sun = new THREE.DirectionalLight(0xffffff, 5);
+  sun.castShadow = true;
+  scene.add(sun);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.1));
+
+  // Position & aim the sun so it casts across the entire maze
+  const mazeWidth  = maze[0].length * tileSize;
+  const mazeHeight = maze.length      * tileSize;
+  const centerX    = mazeWidth  / 2;
+  const centerZ    = mazeHeight / 2;
+
+  sun.position.set(centerX - 500, 800, centerZ - 500);
+  sun.target.position.set(centerX, 0, centerZ);
+  scene.add(sun.target);
+
+sun.shadow.mapSize.set(1024,1024);
+  sun.shadow.camera.near = 0.1;
+  sun.shadow.camera.far  = 2000;
+  const margin = 100;
+  sun.shadow.camera.left   = -mazeWidth/2 - margin;
+  sun.shadow.camera.right  =  mazeWidth/2 + margin;
+  sun.shadow.camera.top    =  mazeHeight/2 + margin;
+  sun.shadow.camera.bottom = -mazeHeight/2 - margin;
+  sun.shadow.bias   = -0.001;
+  sun.shadow.radius = 2;
+
+  // —————————————————————————————— Texture Loading ——————————————————————————————
+  const urls = {
+    map:    'https://dl.polyhaven.org/file/ph-assets/Textures/jpg/4k/plastered_wall_04/plastered_wall_04_diff_4k.jpg',
+    ao:     'https://dl.polyhaven.org/file/ph-assets/Textures/jpg/4k/plastered_wall_04/plastered_wall_04_ao_4k.jpg',
+    normal: 'https://dl.polyhaven.org/file/ph-assets/Textures/jpg/4k/plastered_wall_04/plastered_wall_04_nor_gl_4k.jpg',
+    rough:  'https://dl.polyhaven.org/file/ph-assets/Textures/jpg/4k/plastered_wall_04/plastered_wall_04_rough_4k.jpg'
+  };
+
+  const manager = new THREE.LoadingManager(() => {
+    buildFloor();
+    buildWalls();
+    buildCeiling();
+    buildPortals();
+    animate();
+  });
+  const loader = new THREE.TextureLoader(manager).setCrossOrigin('anonymous');
+  const tex = {
+    map:    loader.load(urls.map),
+    ao:     loader.load(urls.ao),
+    normal: loader.load(urls.normal),
+    rough:  loader.load(urls.rough)
+  };
+  Object.values(tex).forEach(t => {
+    t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  });
+  tex.map.encoding = THREE.sRGBEncoding;
+
+  // —————————————————————————————— Helpers ——————————————————————————————
+
+  function buildFloor() {
+    const mat = new THREE.MeshStandardMaterial({
+      map: tex.map.clone(),
+      aoMap: tex.ao.clone(),
+      normalMap: tex.normal.clone(),
+      roughnessMap: tex.rough.clone(),
+      aoMapIntensity: 1.05,
+      roughness: 1,
+      metalness: 0,
+      color: 0xCCCCCC
+    });
+    mat.map.repeat.set(maze[0].length, maze.length);
+    mat.aoMap.repeat.set(maze[0].length, maze.length);
+    mat.normalMap.repeat.set(maze[0].length, maze.length);
+    mat.roughnessMap.repeat.set(maze[0].length, maze.length);
+
+    const geo = new THREE.PlaneGeometry(
+      maze[0].length * tileSize,
+      maze.length      * tileSize
+    );
+    geo.rotateX(-Math.PI / 2);
+    geo.setAttribute('uv2',
+      new THREE.BufferAttribute(geo.attributes.uv.array, 2)
+    );
+
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.receiveShadow = true;
+    mesh.position.set(centerX, 0, centerZ);
+    scene.add(mesh);
+  }
+
+  function buildWalls() {
+    const wallMat = new THREE.MeshStandardMaterial({
+      map: tex.map, aoMap: tex.ao, normalMap: tex.normal,
+      roughnessMap: tex.rough, aoMapIntensity: 0.5,
+      roughness: 1, metalness: 0
+    });
+    const shadowMat = new THREE.ShadowMaterial({ opacity: 0.3 });
+
+    // count walls
+    let count = 0;
+    maze.forEach(row => row.forEach(cell => cell === 1 && count++));
+
+    const boxGeo = new THREE.BoxGeometry(tileSize + 0.01, tileSize, tileSize + 0.01);
+    boxGeo.setAttribute('uv2',
+      new THREE.BufferAttribute(boxGeo.attributes.uv.array, 2)
+    );
+
+    const inst = new THREE.InstancedMesh(boxGeo, wallMat, count);
+    inst.castShadow = inst.receiveShadow = true;
+
+    let idx = 0;
+    maze.forEach((row, r) => {
+      row.forEach((cell, c) => {
+        if (cell !== 1) return;
+
+        // build the matrix for this wall-instance
+        const x = (c + 0.5) * tileSize;
+        const y = tileSize / 2;
+        const z = (r + 0.5) * tileSize;
+        const matrix = new THREE.Matrix4().makeTranslation(x, y, z);
+        inst.setMatrixAt(idx++, matrix);
+
+        // shadow-plane underneath
+        const sp = new THREE.Mesh(
+          new THREE.PlaneGeometry(tileSize, tileSize),
+          shadowMat
+        );
+        sp.rotation.x = -Math.PI / 2;
+        sp.receiveShadow = true;
+        // place it at the SAME x,z but just above the floor
+        sp.position.set(x, 0.1, z);
+        scene.add(sp);
+      });
+    });
+
+    scene.add(inst);
+  }
+
+  function buildCeiling() {
+    const size = 512;
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const g = c.getContext('2d');
+    const grad = g.createLinearGradient(0, 0, size, size);
+    grad.addColorStop(0,   '#BBBBBB');
+    grad.addColorStop(0.5, '#777777');
+    grad.addColorStop(1,   '#000000');
+    g.fillStyle = grad;
+    g.fillRect(0, 0, size, size);
+
+    const texSky = new THREE.Texture(c);
+    texSky.needsUpdate = true;
+
+    const geo = new THREE.PlaneGeometry(
+      maze[0].length * tileSize,
+      maze.length      * tileSize
+    );
+    geo.rotateX(Math.PI / 2);
+
+    const mat = new THREE.MeshBasicMaterial({
+      map: texSky,
+      side: THREE.DoubleSide
+    });
+    const mesh = new THREE.Mesh(geo, mat);
+    mesh.position.set(centerX, tileSize, centerZ);
+    scene.add(mesh);
+  }
+
+  function buildPortals() {
+    const portalMat = new THREE.ShaderMaterial({
+      uniforms: { time: { value: 0 } },
+      vertexShader: `
+        varying vec2 vUv;
+        void main(){
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.);
+        }
+      `,
+      fragmentShader: `
+        uniform float time;
+        varying vec2 vUv;
+        void main(){
+          vec2 uv = vUv;
+          float d = sin(uv.y*20. + time*2.)*0.03;
+          uv.x += d;
+          float glow = pow(1.0 - distance(uv, vec2(0.5)), 2.5);
+          vec3 col = vec3(0.6,1.,2.) * glow;
+          gl_FragColor = vec4(col, glow);
+        }
+      `,
+      transparent: true,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      blending: THREE.NormalBlending
+    });
+
+    ballCells.forEach(({r,c}, i) => {
+      const size = 80;
+      const geom = new THREE.PlaneGeometry(size, size);
+      const door = new THREE.Mesh(geom, portalMat.clone());
+
+      // orientation
+      let angle = 0;
+      if      (maze[r+1]?.[c] === 0) angle = 0;
+      else if (maze[r-1]?.[c] === 0) angle = Math.PI;
+      else if (maze[r][c+1] === 0)   angle = -Math.PI/2;
+      else if (maze[r][c-1] === 0)   angle = Math.PI/2;
+      door.rotation.y = angle;
+
+      const dir = [0,3,4,5].includes(i) ? -1 : 1;
+      const offset = 39;
+      const px = (c+0.5)*tileSize + dir * Math.sin(angle) * offset;
+      const pz = (r+0.5)*tileSize + dir * Math.cos(angle) * offset;
+      door.position.set(px, size/2, pz);
+      door.castShadow = true;
+      door.userData.portalId = i;
+      scene.add(door);
+
+      const light = new THREE.PointLight(0x66ccff,1,120,2);
+      light.position.copy(door.position);
+      scene.add(light);
+
+      portals.push(door);
+    });
+  }
+
+  // —————————————————————————————— Minimap & Animation ——————————————————————————————
+  const mcv = document.getElementById('map-canvas');
+  const mctx= mcv.getContext('2d');
+  mcv.width = 200;
+  mcv.height = 300;
+ const mapScale = 25;
+const mapTex   = new THREE.CanvasTexture( mcv );
+mapTex.minFilter = THREE.LinearFilter;     // or THREE.NearestFilter for crisp
+mapTex.magFilter = THREE.LinearFilter;
+mapTex.generateMipmaps = false;
+
+/* ----------  PHONE HUD ---------- */
+  const hudPhone = phoneMesh();   // ← mapTex is now defined, safe to use
+camera.add( hudPhone );
+function phoneMesh() {
+  const w = 8, h = 15, r = 1.2, t = 0.4;
+
+  /* phone body */
+  const shape = new THREE.Shape();
+  shape.moveTo(-w/2 + r,  h/2);
+  shape.lineTo( w/2 - r,  h/2);
+  shape.quadraticCurveTo( w/2, h/2,  w/2,  h/2 - r);
+  shape.lineTo( w/2, -h/2 + r);
+  shape.quadraticCurveTo( w/2, -h/2, w/2 - r, -h/2);
+  shape.lineTo(-w/2 + r, -h/2);
+  shape.quadraticCurveTo(-w/2, -h/2, -w/2, -h/2 + r);
+  shape.lineTo(-w/2,  h/2 - r);
+  shape.quadraticCurveTo(-w/2,  h/2, -w/2 + r,  h/2);
+
+  const bodyGeo = new THREE.ExtrudeGeometry(shape, { depth: t, bevelEnabled: false });
+  bodyGeo.translate(0, 0, -t/2);
+
+  const bodyMat = new THREE.MeshStandardMaterial({
+    color: 0x333333,
+    metalness: 0.9,
+    roughness: 0.05
+  });
+
+  const body = new THREE.Mesh(bodyGeo, bodyMat);
+
+  /* screen (the minimap) */
+  const scr = new THREE.Mesh(
+    new THREE.PlaneGeometry(w * 0.85, h * 0.85),
+    new THREE.MeshBasicMaterial({
+      map: mapTex,
+      toneMapped: false,   // keep 1:1 colours
+      side: THREE.FrontSide
+    })
+  );
+  scr.position.set(0, 0, t/2 + 0.01);
+  body.add(scr);
+
+  // size / position relative to camera
+  body.position.set(12, -4, -10);
+  body.rotation.x = THREE.MathUtils.degToRad(0);
+  body.scale.set(0.5, 0.5, 0.5);
+
+  return body;
+}
+  
+function drawPlayer(ctx, x, y) {
+  const s = 10;
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(x - s / 2, y - s / 2, s, s);
+}
+
+function drawWallCell(ctx, row, col, x, y, s) {
+  const below = row < maze.length - 1 && maze[row + 1][col] === 1;
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(x, y, s, below ? s : s / 2);
+  if (!below) {
+    for (let ry = 0; ry < s / 2; ry += 2)
+      for (let cx = 0; cx < s; cx += 2) {
+        ctx.fillStyle = ((ry + cx) % 4 === 0) ? "#fff" : "#000";
+        ctx.fillRect(x + cx, y + s / 2 + ry, 2, 2);
+      }
+  }
+}
+
+function updateMinimap() {
+  mctx.fillStyle = "#000";
+  mctx.fillRect(0, 0, mcv.width, mcv.height);
+
+  const cx = mcv.width / 2,
+        cz = mcv.height / 2,
+        px = player.x / tileSize * mapScale,
+        pz = player.z / tileSize * mapScale;
+
+  mctx.save();
+  mctx.translate(cx, cz);
+  mctx.rotate(player.angle);
+
+  // walls
+  maze.forEach((row, r) =>
+    row.forEach((cell, c) => {
+      if (cell === 1) {
+        const x = c * mapScale - px;
+        const y = r * mapScale - pz;
+        drawWallCell(mctx, r, c, x, y, mapScale);
+      }
+    })
+  );
+
+  // portals
+  ballCells.forEach(({ r, c }) => {
+    const bx = c * mapScale - px + mapScale / 2;
+    const bz = r * mapScale - pz + mapScale / 2;
+    mctx.fillStyle = "#33bbff";
+    mctx.beginPath();
+    mctx.arc(bx, bz, mapScale * 0.2, 0, Math.PI * 2);
+    mctx.fill();
+  });
+
+  mctx.restore();
+  drawPlayer(mctx, cx, cz);
+  mapTex.needsUpdate = true;
+}
+
+  const player = { x:4.5*tileSize, z:2.5*tileSize, angle:-Math.PI/0.9 };
+  const keys   = { ArrowUp:0, ArrowDown:0, ArrowLeft:0, ArrowRight:0 };
+  window.addEventListener('keydown', e => { if(e.key in keys) keys[e.key]=1; });
+  window.addEventListener('keyup',   e => { if(e.key in keys) keys[e.key]=0; });
+
+  function isWall(x,z) {
+    const gx = Math.floor(x/tileSize), gz = Math.floor(z/tileSize);
+    return gz<0||gz>=maze.length||gx<0||gx>=maze[0].length||maze[gz][gx]===1;
+  }
+  function isColliding(x,z,r) {
+    for (let a=0; a<360; a+=45) {
+      const rad = a * Math.PI/180;
+      if (isWall(x+Math.cos(rad)*r, z+Math.sin(rad)*r)) return true;
+    }
+    return false;
+  }
+
+  let walkTime = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+
+    // movement
+    const fwd = keys.ArrowUp - keys.ArrowDown;
+    if (keys.ArrowLeft)  player.angle += 0.05;
+    if (keys.ArrowRight) player.angle -= 0.05;
+
+    const dx = -Math.sin(player.angle)*fwd*2,
+          dz = -Math.cos(player.angle)*fwd*2;
+    if (!isColliding(player.x+dx, player.z, 15)) player.x += dx;
+    if (!isColliding(player.x, player.z+dz, 15)) player.z += dz;
+
+    walkTime = fwd ? walkTime + 0.1 : walkTime;
+
+    // update camera
+    camera.position.set(player.x, 40 + Math.sin(walkTime)*2, player.z);
+    camera.rotation.set(0, player.angle, 0);
+
+    updateMinimap();
+
+  portals.forEach(door => {
+    const dxP = player.x - door.position.x;
+    const dzP = player.z - door.position.z;
+    const dist = Math.hypot(dxP, dzP);
+    if (dist < 25 && activePortal !== door) {
+      // just entered this portal’s radius
+      activePortal = door;
+      openOverlay(door.userData.portalId);
+    }
+    if (dist > 30 && activePortal === door) {
+      activePortal = null;
+      }
+    });
+
+    renderer.render(scene, camera);
+  }
+}
+  </script>
+</body>
+</html>
